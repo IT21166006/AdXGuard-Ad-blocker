@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdXGuard Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4a90e2;
+        }
+        h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        .ad-placeholder {
+            background: #ffeb3b;
+            padding: 20px;
+            margin: 10px 0;
+            border: 2px dashed #ff9800;
+            text-align: center;
+            border-radius: 4px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .blocked {
+            background: #4caf50;
+            color: white;
+        }
+        .not-blocked {
+            background: #f44336;
+            color: white;
+        }
+        button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #357abd;
+        }
+        #results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛡️ AdXGuard Test Page</h1>
+    
+    <div class="test-section">
+        <h2>Test Instructions</h2>
+        <ol>
+            <li>Make sure AdXGuard extension is installed and enabled</li>
+            <li>Open the extension popup to see the interface</li>
+            <li>Click the test buttons below to try loading ad resources</li>
+            <li>Check if the resources are blocked (they should fail to load)</li>
+            <li>Check the extension popup - blocked count should increase</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Ad Blocking</h2>
+        <p>Click the buttons below to test if ad domains are being blocked:</p>
+        
+        <button onclick="testBlock('https://www.googletagservices.com/tag/js/gpt.js')">
+            Test Google Ad Services
+        </button>
+        
+        <button onclick="testBlock('https://www.googlesyndication.com/adsbygoogle.js')">
+            Test Google Syndication
+        </button>
+        
+        <button onclick="testBlock('https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')">
+            Test Google PageAd
+        </button>
+        
+        <button onclick="testBlock('https://www.googleadservices.com/pagead/conversion.js')">
+            Test Google Ad Services Conversion
+        </button>
+        
+        <button onclick="testBlock('https://www.facebook.com/tr')">
+            Test Facebook Tracking
+        </button>
+        
+        <button onclick="testAll()">Test All</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test with Real Ad Elements</h2>
+        <p>These elements will try to load ads. If blocked, they won't appear:</p>
+        
+        <div class="ad-placeholder">
+            <p><strong>Ad Space 1:</strong> Trying to load Google AdSense...</p>
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-test"
+                 data-ad-slot="1234567890"
+                 data-ad-format="auto"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
+        <div class="ad-placeholder">
+            <p><strong>Ad Space 2:</strong> Trying to load DoubleClick ad...</p>
+            <iframe src="https://www.doubleclick.net/test" width="300" height="250" style="border:1px solid #ccc;"></iframe>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Check Extension Popup</h2>
+        <p>Open the AdXGuard extension popup and check:</p>
+        <ul>
+            <li>✅ Current website URL is displayed</li>
+            <li>✅ "This Website" blocked count shows numbers</li>
+            <li>✅ "This Month" count is increasing</li>
+            <li>✅ Toggle switch is ON (green)</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🌐 Test on Real Websites</h2>
+        <p>Click these links to test ad blocking on popular websites:</p>
+        
+        <h3>📰 News Websites (Heavy Ads)</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0;">
+            <a href="https://www.cnn.com" target="_blank" style="padding: 10px; background: #e3f2fd; border-radius: 4px; text-decoration: none; color: #1976d2; display: block;">
+                <strong>CNN.com</strong><br>
+                <small>News with banner ads</small>
+            </a>
+            <a href="https://www.forbes.com" target="_blank" style="padding: 10px; background: #e3f2fd; border-radius: 4px; text-decoration: none; color: #1976d2; display: block;">
+                <strong>Forbes.com</strong><br>
+                <small>Business news with ads</small>
+            </a>
+            <a href="https://www.bbc.com" target="_blank" style="padding: 10px; background: #e3f2fd; border-radius: 4px; text-decoration: none; color: #1976d2; display: block;">
+                <strong>BBC.com</strong><br>
+                <small>International news</small>
+            </a>
+            <a href="https://www.reuters.com" target="_blank" style="padding: 10px; background: #e3f2fd; border-radius: 4px; text-decoration: none; color: #1976d2; display: block;">
+                <strong>Reuters.com</strong><br>
+                <small>Financial news</small>
+            </a>
+            <a href="https://www.theguardian.com" target="_blank" style="padding: 10px; background: #e3f2fd; border-radius: 4px; text-decoration: none; color: #1976d2; display: block;">
+                <strong>TheGuardian.com</strong><br>
+                <small>UK news site</small>
+            </a>
+            <a href="https://www.dailymail.co.uk" target="_blank" style="padding: 10px; background: #e3f2fd; border-radius: 4px; text-decoration: none; color: #1976d2; display: block;">
+                <strong>DailyMail.co.uk</strong><br>
+                <small>Many ads</small>
+            </a>
+        </div>
+
+        <h3>🎬 Video & Entertainment</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0;">
+            <a href="https://www.youtube.com" target="_blank" style="padding: 10px; background: #fff3e0; border-radius: 4px; text-decoration: none; color: #e65100; display: block;">
+                <strong>YouTube.com</strong><br>
+                <small>Video pre-roll ads</small>
+            </a>
+            <a href="https://www.twitch.tv" target="_blank" style="padding: 10px; background: #fff3e0; border-radius: 4px; text-decoration: none; color: #e65100; display: block;">
+                <strong>Twitch.tv</strong><br>
+                <small>Streaming ads</small>
+            </a>
+            <a href="https://www.hulu.com" target="_blank" style="padding: 10px; background: #fff3e0; border-radius: 4px; text-decoration: none; color: #e65100; display: block;">
+                <strong>Hulu.com</strong><br>
+                <small>Video streaming</small>
+            </a>
+            <a href="https://www.imdb.com" target="_blank" style="padding: 10px; background: #fff3e0; border-radius: 4px; text-decoration: none; color: #e65100; display: block;">
+                <strong>IMDB.com</strong><br>
+                <small>Movie database</small>
+            </a>
+        </div>
+
+        <h3>⚽ Sports Websites</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0;">
+            <a href="https://www.espn.com" target="_blank" style="padding: 10px; background: #f3e5f5; border-radius: 4px; text-decoration: none; color: #7b1fa2; display: block;">
+                <strong>ESPN.com</strong><br>
+                <small>Sports news</small>
+            </a>
+            <a href="https://www.sports.yahoo.com" target="_blank" style="padding: 10px; background: #f3e5f5; border-radius: 4px; text-decoration: none; color: #7b1fa2; display: block;">
+                <strong>Yahoo Sports</strong><br>
+                <small>Sports coverage</small>
+            </a>
+            <a href="https://www.skysports.com" target="_blank" style="padding: 10px; background: #f3e5f5; border-radius: 4px; text-decoration: none; color: #7b1fa2; display: block;">
+                <strong>SkySports.com</strong><br>
+                <small>UK sports</small>
+            </a>
+            <a href="https://www.bleacherreport.com" target="_blank" style="padding: 10px; background: #f3e5f5; border-radius: 4px; text-decoration: none; color: #7b1fa2; display: block;">
+                <strong>BleacherReport.com</strong><br>
+                <small>Sports media</small>
+            </a>
+        </div>
+
+        <h3>🛒 Shopping & E-commerce</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0;">
+            <a href="https://www.amazon.com" target="_blank" style="padding: 10px; background: #e8f5e9; border-radius: 4px; text-decoration: none; color: #2e7d32; display: block;">
+                <strong>Amazon.com</strong><br>
+                <small>Product ads</small>
+            </a>
+            <a href="https://www.ebay.com" target="_blank" style="padding: 10px; background: #e8f5e9; border-radius: 4px; text-decoration: none; color: #2e7d32; display: block;">
+                <strong>eBay.com</strong><br>
+                <small>Auction site</small>
+            </a>
+            <a href="https://www.aliexpress.com" target="_blank" style="padding: 10px; background: #e8f5e9; border-radius: 4px; text-decoration: none; color: #2e7d32; display: block;">
+                <strong>AliExpress.com</strong><br>
+                <small>Online shopping</small>
+            </a>
+            <a href="https://www.walmart.com" target="_blank" style="padding: 10px; background: #e8f5e9; border-radius: 4px; text-decoration: none; color: #2e7d32; display: block;">
+                <strong>Walmart.com</strong><br>
+                <small>Retail ads</small>
+            </a>
+        </div>
+
+        <h3>💻 Tech & Gaming</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0;">
+            <a href="https://www.techcrunch.com" target="_blank" style="padding: 10px; background: #fce4ec; border-radius: 4px; text-decoration: none; color: #c2185b; display: block;">
+                <strong>TechCrunch.com</strong><br>
+                <small>Tech news</small>
+            </a>
+            <a href="https://www.theverge.com" target="_blank" style="padding: 10px; background: #fce4ec; border-radius: 4px; text-decoration: none; color: #c2185b; display: block;">
+                <strong>TheVerge.com</strong><br>
+                <small>Tech reviews</small>
+            </a>
+            <a href="https://www.ign.com" target="_blank" style="padding: 10px; background: #fce4ec; border-radius: 4px; text-decoration: none; color: #c2185b; display: block;">
+                <strong>IGN.com</strong><br>
+                <small>Gaming news</small>
+            </a>
+            <a href="https://www.polygon.com" target="_blank" style="padding: 10px; background: #fce4ec; border-radius: 4px; text-decoration: none; color: #c2185b; display: block;">
+                <strong>Polygon.com</strong><br>
+                <small>Gaming & culture</small>
+            </a>
+        </div>
+
+        <h3>📚 Blogs & Content Sites</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0;">
+            <a href="https://www.buzzfeed.com" target="_blank" style="padding: 10px; background: #fff9c4; border-radius: 4px; text-decoration: none; color: #f57f17; display: block;">
+                <strong>BuzzFeed.com</strong><br>
+                <small>Content with ads</small>
+            </a>
+            <a href="https://www.medium.com" target="_blank" style="padding: 10px; background: #fff9c4; border-radius: 4px; text-decoration: none; color: #f57f17; display: block;">
+                <strong>Medium.com</strong><br>
+                <small>Blogging platform</small>
+            </a>
+            <a href="https://www.huffpost.com" target="_blank" style="padding: 10px; background: #fff9c4; border-radius: 4px; text-decoration: none; color: #f57f17; display: block;">
+                <strong>HuffPost.com</strong><br>
+                <small>News & opinion</small>
+            </a>
+            <a href="https://www.vice.com" target="_blank" style="padding: 10px; background: #fff9c4; border-radius: 4px; text-decoration: none; color: #f57f17; display: block;">
+                <strong>Vice.com</strong><br>
+                <small>Alternative media</small>
+            </a>
+        </div>
+
+        <div style="background: #e1f5fe; padding: 15px; border-radius: 8px; margin-top: 20px;">
+            <h3 style="margin-top: 0;">✅ What to Check When Testing:</h3>
+            <ul style="margin-bottom: 0;">
+                <li><strong>Visual Check:</strong> Ads should NOT appear on the page</li>
+                <li><strong>Speed:</strong> Page should load faster without ads</li>
+                <li><strong>Extension Popup:</strong> Open AdXGuard popup - blocked counts should increase</li>
+                <li><strong>Network Tab:</strong> Press F12 → Network tab → Look for blocked requests (red/failed)</li>
+                <li><strong>Clean Layout:</strong> Page should look cleaner without ad banners</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+        let testCount = 0;
+        let blockedCount = 0;
+
+        function testBlock(url) {
+            testCount++;
+            const testName = url.split('/')[2]; // Get domain name
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'status';
+            statusDiv.id = 'test-' + testCount;
+            statusDiv.innerHTML = `Testing: ${testName}...`;
+            resultsDiv.appendChild(statusDiv);
+
+            // Try to load the resource
+            const img = new Image();
+            const startTime = Date.now();
+            
+            img.onload = function() {
+                const time = Date.now() - startTime;
+                statusDiv.className = 'status not-blocked';
+                statusDiv.innerHTML = `❌ ${testName}: <strong>NOT BLOCKED</strong> (loaded in ${time}ms) - Ad blocker may not be working for this domain`;
+            };
+            
+            img.onerror = function() {
+                const time = Date.now() - startTime;
+                blockedCount++;
+                statusDiv.className = 'status blocked';
+                statusDiv.innerHTML = `✅ ${testName}: <strong>BLOCKED</strong> (failed in ${time}ms) - Ad blocker is working!`;
+            };
+
+            // Set timeout
+            setTimeout(() => {
+                if (!img.complete) {
+                    blockedCount++;
+                    statusDiv.className = 'status blocked';
+                    statusDiv.innerHTML = `✅ ${testName}: <strong>BLOCKED</strong> (timeout) - Ad blocker is working!`;
+                }
+            }, 2000);
+
+            img.src = url + '?t=' + Date.now(); // Add timestamp to prevent caching
+        }
+
+        function testAll() {
+            resultsDiv.innerHTML = '';
+            testCount = 0;
+            blockedCount = 0;
+            
+            const tests = [
+                'https://www.googletagservices.com/tag/js/gpt.js',
+                'https://www.googlesyndication.com/adsbygoogle.js',
+                'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
+                'https://www.googleadservices.com/pagead/conversion.js',
+                'https://www.facebook.com/tr'
+            ];
+
+            tests.forEach((url, index) => {
+                setTimeout(() => {
+                    testBlock(url);
+                }, index * 500);
+            });
+
+            setTimeout(() => {
+                const summary = document.createElement('div');
+                summary.className = 'status';
+                summary.style.marginTop = '20px';
+                summary.style.fontSize = '18px';
+                summary.style.fontWeight = 'bold';
+                summary.innerHTML = `📊 Test Results: ${blockedCount}/${testCount} resources blocked`;
+                resultsDiv.appendChild(summary);
+            }, tests.length * 500 + 3000);
+        }
+
+        // Check if extension is installed
+        window.addEventListener('load', () => {
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                chrome.runtime.sendMessage('YOUR_EXTENSION_ID', {action: 'ping'}, (response) => {
+                    if (chrome.runtime.lastError) {
+                        console.log('Extension check: Could not connect (this is normal if extension ID is not set)');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
