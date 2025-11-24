@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom URL Blocking - AdXGuard</title>
+    <link rel="stylesheet" href="popup.css">
+    <style>
+        body {
+            width: 600px;
+            min-height: 500px;
+            padding: 0;
+            margin: 0;
+        }
+        .container {
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+        .back-button {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-button:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        .add-section {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .url-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        .url-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .add-button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .add-button:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+        .add-button:disabled {
+            background: var(--toggle-off);
+            cursor: not-allowed;
+            transform: none;
+        }
+        .help-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+        .blocked-list {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
+        }
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .list-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .clear-all-button {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .clear-all-button:hover {
+            border-color: #f44336;
+            color: #f44336;
+        }
+        .blocked-item {
+            background: var(--bg-primary);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+        .blocked-url {
+            flex: 1;
+            font-size: 14px;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+        .remove-button {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .remove-button:hover {
+            background: #d32f2f;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .examples {
+            background: var(--bg-secondary);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .examples-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .example-item {
+            font-size: 11px;
+            color: var(--text-secondary);
+            padding: 4px 0;
+            font-family: monospace;
+        }
+        .status-message {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: none;
+        }
+        .status-message.success {
+            background: #4caf50;
+            color: white;
+            display: block;
+        }
+        .status-message.error {
+            background: #f44336;
+            color: white;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 style="margin: 0; font-size: 24px; color: var(--text-primary);">Custom URL Blocking</h1>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: var(--text-secondary);">Block specific URLs or domains</p>
+            </div>
+            <a href="popup.html" class="back-button">← Back</a>
+        </div>
+
+        <div id="statusMessage" class="status-message"></div>
+
+        <div class="add-section">
+            <h2 style="margin: 0 0 15px 0; font-size: 16px; color: var(--text-primary);">Add URL to Block</h2>
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="urlInput" 
+                    class="url-input" 
+                    placeholder="Enter URL or domain (e.g., example.com or https://example.com/ads)"
+                    autocomplete="off"
+                >
+                <button id="addButton" class="add-button">Add</button>
+            </div>
+            <div class="help-text">
+                💡 You can block entire domains (example.com) or specific URLs (https://example.com/ads)
+            </div>
+            <div class="examples">
+                <div class="examples-title">Examples:</div>
+                <div class="example-item">• example.com (blocks entire domain)</div>
+                <div class="example-item">• ads.example.com (blocks subdomain)</div>
+                <div class="example-item">• https://example.com/tracker (blocks specific URL)</div>
+            </div>
+        </div>
+
+        <div class="blocked-list">
+            <div class="list-header">
+                <div class="list-title">Blocked URLs (<span id="blockedCount">0</span>)</div>
+                <button id="clearAllButton" class="clear-all-button">Clear All</button>
+            </div>
+            <div id="blockedList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🚫</div>
+                    <div>No custom URLs blocked yet</div>
+                    <div style="font-size: 11px; margin-top: 5px;">Add URLs above to start blocking</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="custom-block.js"></script>
+</body>
+</html>
+
