@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN Plugin - AdXGuard</title>
+    <link rel="stylesheet" href="popup.css">
+    <style>
+        body {
+            width: 600px;
+            min-height: 500px;
+            padding: 0;
+            margin: 0;
+        }
+        .container {
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+        .back-button {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-button:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        .vpn-status-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .status-indicator {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            border: 4px solid;
+            transition: all 0.3s ease;
+        }
+        .status-indicator.connected {
+            background: #4caf50;
+            border-color: #4caf50;
+            color: white;
+        }
+        .status-indicator.disconnected {
+            background: var(--toggle-off);
+            border-color: var(--toggle-off);
+            color: white;
+        }
+        .status-indicator.connecting {
+            background: #ff9800;
+            border-color: #ff9800;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .status-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        .status-subtext {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .vpn-toggle-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .toggle-label {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .toggle-label span:first-child {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--toggle-off);
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--toggle-on);
+        }
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        .server-section {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .server-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .server-item {
+            background: var(--bg-primary);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .server-item:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .server-item.selected {
+            border-color: var(--accent);
+            background: rgba(74, 144, 226, 0.1);
+        }
+        .server-info {
+            flex: 1;
+        }
+        .server-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .server-location {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .server-ping {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-left: 10px;
+        }
+        .server-ping.good {
+            color: #4caf50;
+        }
+        .server-ping.medium {
+            color: #ff9800;
+        }
+        .server-ping.bad {
+            color: #f44336;
+        }
+        .stats-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .ip-info {
+            background: var(--bg-secondary);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .ip-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        .ip-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: monospace;
+        }
+        .premium-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        .troubleshooting-guide {
+            background: var(--bg-secondary);
+            border: 2px solid #ff9800;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .guide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .guide-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .guide-step {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .step-number {
+            background: var(--accent);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .step-content {
+            flex: 1;
+        }
+        .step-content strong {
+            display: block;
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .step-content p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .step-content code {
+            background: var(--bg-primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--accent);
+            font-family: monospace;
+        }
+        .guide-footer {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 style="margin: 0; font-size: 24px; color: var(--text-primary);">🔒 VPN Plugin</h1>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: var(--text-secondary);">Secure your connection</p>
+            </div>
+            <a href="popup.html" class="back-button">← Back</a>
+        </div>
+
+        <div class="vpn-status-card">
+            <div id="statusIndicator" class="status-indicator disconnected">🔴</div>
+            <div class="status-text" id="statusText">Disconnected</div>
+            <div class="status-subtext" id="statusSubtext">Click toggle to connect</div>
+        </div>
+
+        <div class="vpn-toggle-section">
+            <div class="toggle-label">
+                <span>VPN Connection</span>
+                <span id="connectionStatus" style="font-size: 12px; color: var(--text-secondary);">OFF</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="vpnToggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="ip-info">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <div class="ip-label">Your IP Address</div>
+                <button id="refreshIP" style="background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">🔄 Refresh</button>
+            </div>
+            <div class="ip-value" id="ipAddress" style="white-space: pre-line; line-height: 1.6;">Loading...</div>
+        </div>
+
+        <div class="server-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin: 0; font-size: 16px; color: var(--text-primary);">Select Server Location</h2>
+                <span class="premium-badge">⭐ Premium</span>
+            </div>
+            <div class="server-list" id="serverList">
+                <!-- Servers will be loaded here -->
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-label">Data Used</div>
+                <div class="stat-value" id="dataUsed">0 MB</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Connection Time</div>
+                <div class="stat-value" id="connectionTime">00:00</div>
+            </div>
+        </div>
+
+        <!-- Troubleshooting Guide (hidden by default) -->
+        <div id="troubleshootingGuide" class="troubleshooting-guide" style="display: none;">
+            <div class="guide-header">
+                <h3 style="margin: 0; font-size: 16px; color: var(--text-primary);">🔧 Troubleshooting Guide</h3>
+                <button id="closeGuide" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 18px; padding: 0; width: 24px; height: 24px;">×</button>
+            </div>
+            <div class="guide-content">
+                <div class="guide-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <strong>Reload the Extension</strong>
+                        <p>Go to <code>chrome://extensions/</code>, find "AdXGuard", and click the reload button (🔄).</p>
+                    </div>
+                </div>
+                <div class="guide-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <strong>Check Proxy Permission</strong>
+                        <p>Make sure the extension has the "proxy" permission enabled in <code>chrome://extensions/</code> → AdXGuard → Details → Permissions.</p>
+                    </div>
+                </div>
+                <div class="guide-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <strong>Try a Different Server</strong>
+                        <p>Some proxy servers may be unavailable. Try selecting a different server location above.</p>
+                    </div>
+                </div>
+                <div class="guide-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <strong>Check Browser Console</strong>
+                        <p>Press <code>F12</code> to open Developer Tools, check the Console tab for detailed error messages.</p>
+                    </div>
+                </div>
+                <div class="guide-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <strong>Restart Browser</strong>
+                        <p>If the issue persists, try closing and reopening your browser completely.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="guide-footer">
+                <button id="retryConnection" style="background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; width: 100%;">🔄 Retry Connection</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="vpn.js"></script>
+</body>
+</html>
+
