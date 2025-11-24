@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - AdXGuard</title>
+    <link rel="stylesheet" href="popup.css">
+    <style>
+        body {
+            width: 400px;
+            min-height: 400px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .success-container {
+            text-align: center;
+            padding: 40px;
+        }
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        .success-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        .success-message {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .close-button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .close-button:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">✅</div>
+        <h1 class="success-title">Payment Successful!</h1>
+        <p class="success-message">
+            Thank you for your purchase.<br>
+            Premium features are now unlocked.
+        </p>
+        <button class="close-button" id="closeButton">Close</button>
+    </div>
+
+    <script>
+        // Get session ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+        
+        if (sessionId) {
+            // Verify and activate premium
+            chrome.runtime.sendMessage({
+                action: 'verifyPayment',
+                sessionId: sessionId
+            }, (response) => {
+                if (response && response.success) {
+                    console.log('Premium activated successfully');
+                }
+            });
+        }
+        
+        document.getElementById('closeButton').addEventListener('click', () => {
+            window.close();
+        });
+        
+        // Auto-close after 3 seconds
+        setTimeout(() => {
+            window.close();
+        }, 3000);
+    </script>
+</body>
+</html>
+
+
