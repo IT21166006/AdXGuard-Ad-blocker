@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upgrade to Premium - AdXGuard</title>
+    <link rel="stylesheet" href="popup.css">
+    <style>
+        body {
+            width: 500px;
+            min-height: 600px;
+            margin: 0;
+            padding: 0;
+        }
+        .premium-container {
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .premium-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .premium-header h1 {
+            font-size: 36px;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+        .premium-header p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin: 0;
+        }
+        .premium-badge-large {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        .features-list {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .features-list h3 {
+            margin: 0 0 20px 0;
+            font-size: 20px;
+            text-align: center;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+        .feature-item:last-child {
+            margin-bottom: 0;
+        }
+        .feature-icon {
+            font-size: 20px;
+        }
+        .pricing-section {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .price {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        .price-period {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .purchase-button {
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 40px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 15px;
+        }
+        .purchase-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        .purchase-button:active {
+            transform: translateY(0);
+        }
+        .payment-methods {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .payment-method {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            backdrop-filter: blur(5px);
+        }
+        .payment-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .payment-option-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        .payment-option-btn span:first-child {
+            font-size: 24px;
+        }
+        .payment-option-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+        .payment-option-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .manual-payment-info {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 400px;
+            display: none;
+        }
+        .manual-payment-info.active {
+            display: block;
+        }
+        .manual-payment-info h4 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+        }
+        .bank-details {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        .bank-details strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .activation-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .activation-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .activation-input:focus {
+            outline: none;
+            border-color: white;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .back-button-premium {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .back-button-premium:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        .guarantee {
+            font-size: 12px;
+            opacity: 0.8;
+            text-align: center;
+            margin-top: 15px;
+        }
+        [data-theme="dark"] .premium-container {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="premium-container">
+        <button class="back-button-premium" id="backButtonPremium">←</button>
+        
+        <div class="premium-badge-large">⭐</div>
+        
+        <div class="premium-header">
+            <h1>Upgrade to Premium</h1>
+            <p>Unlock all advanced features</p>
+        </div>
+
+        <div class="features-list">
+            <h3>Premium Features</h3>
+            <div class="feature-item">
+                <span class="feature-icon">🚫</span>
+                <span>Custom Website Blocking - Block any website or domain</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🔒</span>
+                <span>VPN Plugin - Secure your connection with VPN</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">⚡</span>
+                <span>Priority Support - Get help faster</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🔄</span>
+                <span>Regular Updates - Latest features first</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🎯</span>
+                <span>Advanced Ad Blocking - Enhanced protection</span>
+            </div>
+        </div>
+
+        <div class="pricing-section">
+            <div class="price-period">One-time Payment</div>
+            <div class="price">$9.99</div>
+            <div class="price-period">Lifetime Access</div>
+        </div>
+
+        <!-- Manual Payment Info (shown when Bank Transfer selected) -->
+        <div class="manual-payment-info" id="manualPaymentInfo">
+            <h4>📧 Bank Transfer Instructions</h4>
+            <div class="bank-details">
+                <strong>Bank Name:</strong>
+                <span id="bankName">Commercial Bank of Ceylon</span><br>
+                <strong>Account Number:</strong>
+                <span id="accountNumber">1234567890</span><br>
+                <strong>Account Name:</strong>
+                <span id="accountName">Your Business Name</span><br>
+                <strong>SWIFT/BIC:</strong>
+                <span id="swiftCode">CBCYLKLX</span>
+            </div>
+            <p style="font-size: 12px; margin: 0 0 15px 0; opacity: 0.9;">
+                After payment, send proof to: <strong>support@adxguard.com</strong><br>
+                Or enter activation code below:
+            </p>
+            <input type="text" id="activationCodeInput" class="activation-input" placeholder="Enter activation code">
+            <button class="purchase-button" id="activateCodeButton" style="margin-top: 10px;">
+                Activate Premium
+            </button>
+        </div>
+
+        <div class="payment-options">
+            <button class="payment-option-btn active" data-method="paypal" id="paypalBtn">
+                <span>💵</span>
+                <span>PayPal</span>
+            </button>
+            <button class="payment-option-btn" data-method="payhere" id="payhereBtn">
+                <span>🏦</span>
+                <span>PayHere</span>
+            </button>
+            <button class="payment-option-btn" data-method="manual" id="manualBtn">
+                <span>💳</span>
+                <span>Bank Transfer</span>
+            </button>
+        </div>
+
+        <button class="purchase-button" id="purchaseButton">
+            Continue with PayPal
+        </button>
+
+        <div class="payment-methods">
+            <div class="payment-method">💳 Credit/Debit Card</div>
+            <div class="payment-method">💵 PayPal</div>
+            <div class="payment-method">🏦 Bank Transfer</div>
+            <div class="payment-method">📱 Mobile Payments</div>
+        </div>
+
+        <div class="guarantee">
+            ✅ 30-Day Money-Back Guarantee
+        </div>
+    </div>
+
+    <script src="premium.js"></script>
+</body>
+</html>
+
