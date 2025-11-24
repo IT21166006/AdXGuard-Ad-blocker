@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdXGuard</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header with Logo -->
+        <div class="header">
+            <img src="icons/icon128.png" alt="AdXGuard Logo" class="logo">
+            <div class="header-content">
+                <h1 class="title">AdXGuard</h1>
+                <div class="current-url" id="currentUrl">Loading...</div>
+            </div>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <span class="theme-icon" id="themeIcon">🌙</span>
+            </button>
+        </div>
+
+        <!-- Ad Blocker Toggle -->
+        <div class="toggle-section">
+            <div class="toggle-label">
+                <span>Ad Blocker</span>
+                <span class="status" id="status">ON</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="adBlockerToggle" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-label">This Website</div>
+                <div class="stat-value" id="websiteCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">This Month</div>
+                <div class="stat-value" id="monthlyCount">0</div>
+            </div>
+        </div>
+
+        <!-- VIP Section -->
+        <div class="vip-section">
+            <div class="vip-header">
+                <span class="vip-badge">⭐ VIP Features</span>
+            </div>
+            
+            <div class="vip-content">
+                <!-- Pay Section -->
+                <button class="vip-button" id="payButton">
+                    <span class="button-icon">💳</span>
+                    <span>Upgrade to Premium</span>
+                </button>
+
+                <!-- Custom Website Blocking -->
+                <button class="vip-button expandable premium-locked" id="customBlockButton" data-section="customBlock" data-premium="true">
+                    <span class="button-icon">🚫</span>
+                    <span>Custom Website Blocking</span>
+                    <span class="lock-icon">🔒</span>
+                    <span class="expand-icon">▼</span>
+                </button>
+
+                <!-- VPN Plugin -->
+                <button class="vip-button expandable premium-locked" id="vpnButton" data-section="vpn" data-premium="true">
+                    <span class="button-icon">🔒</span>
+                    <span>VPN Plugin</span>
+                    <span class="lock-icon">🔒</span>
+                    <span class="expand-icon">▼</span>
+                </button>
+            </div>
+        </div>
+
+        
+        <!-- Premium Lock Overlay -->
+        <div id="premiumLockOverlay" class="premium-lock-overlay" style="display: none;">
+            <div class="premium-lock-content">
+                <div class="lock-icon-large">🔒</div>
+                <h3>Premium Feature</h3>
+                <p>This feature is available for Premium users only.</p>
+                <button class="upgrade-now-btn" id="upgradeFromLock">Upgrade to Premium</button>
+                <button class="close-lock-btn" id="closeLockOverlay">Close</button>
+            </div>
+        </div>
+
+        <!-- Custom Blocking Section (Hidden by default) -->
+        <div id="customBlockSection" class="expandable-section" style="display: none;">
+            <div class="section-header">
+                <h3>🚫 Custom Website Blocking</h3>
+                <button class="close-section" data-section="customBlock">×</button>
+            </div>
+            <div class="section-content">
+                <div class="input-group">
+                    <input type="text" id="urlInput" placeholder="Enter URL or domain (e.g., example.com)" class="url-input">
+                    <button id="addUrlButton" class="add-button">Add</button>
+                </div>
+                <div class="status-message" id="customBlockStatus"></div>
+                <div class="blocked-list-container">
+                    <ul class="blocked-list" id="blockedList">
+                        <!-- Blocked URLs will be listed here -->
+                    </ul>
+                </div>
+                <div class="blocked-footer">
+                    <span id="blockedCount">0 URLs blocked</span>
+                    <button class="clear-all-btn" id="clearAllButton">Clear All</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VPN Section (Hidden by default) -->
+        <div id="vpnSection" class="expandable-section" style="display: none;">
+            <div class="section-header">
+                <h3>🔒 VPN Plugin</h3>
+                <button class="close-section" data-section="vpn">×</button>
+            </div>
+            <div class="section-content">
+                <!-- VPN Status -->
+                <div class="vpn-status-card">
+                    <div id="vpnStatusIndicator" class="vpn-status-indicator disconnected">🔴</div>
+                    <div class="vpn-status-text" id="vpnStatusText">Disconnected</div>
+                    <div class="vpn-status-subtext" id="vpnStatusSubtext">Click toggle to connect</div>
+                </div>
+
+                <!-- VPN Toggle -->
+                <div class="vpn-toggle-section">
+                    <div class="toggle-label">
+                        <span>VPN Connection</span>
+                        <span id="vpnConnectionStatus" style="font-size: 12px; color: var(--text-secondary);">OFF</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="vpnToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- IP Address Display -->
+                <div class="ip-info-card">
+                    <div class="ip-header">
+                        <span class="ip-label">Your IP Address</span>
+                        <button id="refreshIP" class="refresh-btn">🔄</button>
+                    </div>
+                    <div class="ip-value" id="ipAddress">Detecting...</div>
+                </div>
+
+                <!-- Server Selection -->
+                <div class="server-section">
+                    <div class="server-header">
+                        <span>Select Server Location</span>
+                        <span class="premium-badge-small">⭐</span>
+                    </div>
+                    <div class="server-list" id="serverList">
+                        <!-- Servers will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- VPN Stats -->
+                <div class="vpn-stats">
+                    <div class="vpn-stat-card">
+                        <div class="vpn-stat-label">Data Used</div>
+                        <div class="vpn-stat-value" id="vpnDataUsed">0 MB</div>
+                    </div>
+                    <div class="vpn-stat-card">
+                        <div class="vpn-stat-label">Connection Time</div>
+                        <div class="vpn-stat-value" id="vpnConnectionTime">00:00</div>
+                    </div>
+                </div>
+
+                
+
+            </div>
+        </div>
+        <!-- Footer Section -->
+        <div class="footer-section">
+            <div class="footer-content">
+                <div class="copyright">
+                    <span>© 2024</span>
+                    <span class="copyright-name">@tdmaxer</span>
+                </div>
+                <div class="coffee-link-wrapper">
+                    <a href="https://www.buymeacoffee.com/tharindudilshan" target="_blank" class="coffee-link">
+                        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+                             alt="Buy Me A Coffee"
+                             class="coffee-image">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
